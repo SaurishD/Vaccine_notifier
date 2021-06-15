@@ -34,9 +34,11 @@ class _HomeState extends State<Home> {
   String distCode = "";
   List<dynamic> data = [];
   List<String> dose = ["_dose1", "_dose2"];
+  List<String> vaccine = ["All","COVISHIELD","COVAXIN","SPUTNIKV"];
   List<int> age = [18, 45];
   int ageIndex = 0;
   int doseIndex = 0;
+  int vaccineIndex = 0;
   Color primaryFontColor = Colors.grey[700];
   FlutterLocalNotificationsPlugin _localNotifications;
   Timer fetchTimer;
@@ -62,7 +64,7 @@ class _HomeState extends State<Home> {
         0,
         "Vaccine are available",
         num.toString() + " Slots are available in your city",
-        notificationDetails);
+        notificationDetails,);
   }
 
   void _getData() async {
@@ -102,6 +104,7 @@ class _HomeState extends State<Home> {
       pincode = pref.getString('pincode') ?? "";
       _enableNotification = pref.getBool("notification") ?? false;
       _fetchByPincode = pref.getBool("fetchPincode") ?? false;
+      vaccineIndex = pref.getInt("vaccine") ?? 0;
 
       if (!_fetchByPincode && (distCode == "" || distCode == null)) {
         fetchTimer.cancel();
@@ -126,19 +129,27 @@ class _HomeState extends State<Home> {
       var temp = await _fetchFromServer(1);
       temp =
           temp.where((val) => val['min_age_limit'] == age[ageIndex]).toList();
+      if(vaccineIndex!=0){
+        temp = temp.where((val)=> val['vaccine'] == vaccine[vaccineIndex]).toList();
+      }
       data.clear();
       data.addAll(temp);
       //print(data);
       temp = await _fetchFromServer(0);
       temp =
           temp.where((val) => val['min_age_limit'] == age[ageIndex]).toList();
+      if(vaccineIndex!=0){
+        temp = temp.where((val)=> val['vaccine'] == vaccine[vaccineIndex]).toList();
+      }
       data.addAll(temp);
       int total = 0;
-      if (data.length == 0) {
+      if (data.length == 0 && mounted) {
         Fluttertoast.showToast(
             msg: "No Centers found for given filters",
             gravity: ToastGravity.CENTER,
             toastLength: Toast.LENGTH_SHORT);
+        fetchTimer.cancel();
+        Navigator.pushReplacement(context, MyCustomFormRoute());
       }
       for (var item in data) {
         total += item['available_capacity' + dose[doseIndex]];

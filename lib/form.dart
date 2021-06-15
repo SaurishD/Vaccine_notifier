@@ -35,14 +35,14 @@ class _MyCustomFormState extends State<MyCustomForm> {
   var selectedCity = "Select City";
 
   UserAge _age = UserAge.EighteenPlus;
-  //VaccineType _vaccineType = VaccineType.All;
+  VaccineType _vaccineType = VaccineType.All;
   UserDose _dose = UserDose.Dose1;
-  String _name = "";
-  String _mobileNumber = "";
+  //String _name = "";
+  //String _mobileNumber = "";
   String _pincode = "";
   String _districtCode = "";
-  TextEditingController _nameController = new TextEditingController();
-  TextEditingController _mobileNumberController = new TextEditingController();
+  //TextEditingController _nameController = new TextEditingController();
+  //TextEditingController _mobileNumberController = new TextEditingController();
   TextEditingController _pincodeController = new TextEditingController();
   bool _enableNotification = true;
   bool _fetchByPincode = false;
@@ -51,18 +51,18 @@ class _MyCustomFormState extends State<MyCustomForm> {
     final pref = await SharedPreferences.getInstance();
 
     setState(() {
-      _name = pref.getString('name') ?? "";
-      _nameController.text = _name;
+      //_name = pref.getString('name') ?? "";
+      //_nameController.text = _name;
 
-      _mobileNumber = pref.getString('mobile') ?? "";
-      _mobileNumberController.text = _mobileNumber;
+      //_mobileNumber = pref.getString('mobile') ?? "";
+      //_mobileNumberController.text = _mobileNumber;
 
       _pincode = pref.getString('pincode') ?? "";
       _pincodeController.text = _pincode;
 
       _age = UserAge.values[pref.getInt('age') ?? 0];
 
-      //_vaccineType = VaccineType.values[pref.getInt('vaccine') ?? 0];
+      _vaccineType = VaccineType.values[pref.getInt('vaccine') ?? 0];
 
       _dose = UserDose.values[pref.getInt('dose') ?? 0];
 
@@ -72,7 +72,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   }
 
   //Setters
-  void _setName(String value) async {
+  /*void _setName(String value) async {
     final pref = await SharedPreferences.getInstance();
     print("Name set to " + value);
     pref.setString('name', value);
@@ -83,7 +83,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
     print("Mobile number set to " + value);
     pref.setString('mobile', value);
   }
-
+  */
   void _setPincode(String value) async {
     final pref = await SharedPreferences.getInstance();
     pref.setString('pincode', value);
@@ -99,10 +99,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
     pref.setInt('age', value.index);
   }
 
-  /*void _setVaccine(VaccineType value) async {
+  void _setVaccine(VaccineType value) async {
     final pref = await SharedPreferences.getInstance();
     pref.setInt('vaccine', value.index);
-  }*/
+  }
 
   void _setDose(UserDose value) async {
     final pref = await SharedPreferences.getInstance();
@@ -186,7 +186,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                   child: IntrinsicHeight(
                     child: Column(
                       children: <Widget>[
-                        TextFormField(
+                        /*TextFormField(
                           controller: _nameController,
                           decoration: InputDecoration(
                             labelText: "Name *",
@@ -219,23 +219,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             }
                           },
                         ),
-                        TextFormField(
-                          controller: _pincodeController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: "Pincode",
-                          ),
-                          onSaved: (String value) {
-                            setState(() {
-                              _pincode = value;
-                            });
-                          },
-                          validator: (String value) {
-                            if (value.isNotEmpty && value.length != 6) {
-                              return "Enter a valid pincode";
-                            }
-                          },
-                        ),
+                        */
                         DropdownButton<String>(
                           value: selectedState,
                           onChanged: (String newValue) {
@@ -276,6 +260,24 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           hint: Text("Select City"),
                           isExpanded: true,
                         ),
+                        TextFormField(
+                          controller: _pincodeController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: "Pincode",
+                          ),
+                          onSaved: (String value) {
+                            setState(() {
+                              _pincode = value;
+                            });
+                          },
+                          validator: (String value) {
+                            if (value.isNotEmpty && value.length != 6) {
+                              return "Enter a valid pincode";
+                            }
+                          },
+                        ),
+                        
                         Row(children: <Widget>[
                           Flexible(
                             child: ListTile(
@@ -311,7 +313,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           )
                         ]),
                         Divider(),
-                        /*Flexible(
+                        Flexible(
                           child: ListTile(
                             title: Text("All"),
                             leading: Radio<VaccineType>(
@@ -375,7 +377,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             ),
                           ),
                         ),
-                        Divider(),*/
+                        Divider(),
                         Row(children: <Widget>[
                           Flexible(
                             child: ListTile(
@@ -410,6 +412,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             ),
                           )
                         ]),
+                        Divider(),
                         SwitchListTile(
                             value: _enableNotification,
                             title: Text("Notification"),
@@ -419,6 +422,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                                 _enableNotification = value;
                               });
                             }),
+                        Divider(),
                         SwitchListTile(
                             value: _fetchByPincode,
                             title: Text("Fetch slots by pincode"),
@@ -440,13 +444,13 @@ class _MyCustomFormState extends State<MyCustomForm> {
                                 return;
                               }
                               formKey.currentState.save();
-                              _setName(_name);
-                              _setMobileNumber(_mobileNumber);
+                              //_setName(_name);
+                              //_setMobileNumber(_mobileNumber);
                               _setPincode(_pincode);
                               _setFetchPincode(_fetchByPincode);
                               _setDistrictCode(_districtCode);
                               _setAge(_age);
-                              //_setVaccine(_vaccineType);
+                              _setVaccine(_vaccineType);
                               _setDose(_dose);
                               _setNotification(_enableNotification);
                               Navigator.push(context, HomePage());
