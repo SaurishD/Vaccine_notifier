@@ -24,7 +24,6 @@ class HomePage extends MaterialPageRoute<Null> {
 class Home extends StatefulWidget {
   static String id = "home";
   final _HomeState _homeState = _HomeState();
-  
 
   @override
   _HomeState createState() => _homeState;
@@ -42,6 +41,7 @@ class _HomeState extends State<Home> {
   FlutterLocalNotificationsPlugin _localNotifications;
   Timer fetchTimer;
   bool _enableNotification;
+  bool _fetchByPincode = false;
 
   @override
   void initState() {
@@ -76,11 +76,20 @@ class _HomeState extends State<Home> {
     final DateTime day = DateTime(now.year, now.month, now.day + days);
     final DateFormat df = DateFormat("dd-MM-yyyy");
     String date = df.format(day);
-    String uri =
-        "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id=" +
-            distCode +
-            "&date=" +
-            date;
+    String uri;
+    if (_fetchByPincode) {
+      uri =
+          "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode=" +
+              pincode +
+              "&date=" +
+              date;
+    } else {
+      uri =
+          "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByDistrict?district_id=" +
+              distCode +
+              "&date=" +
+              date;
+    }
     print(uri);
     var response = await http.get(Uri.parse(uri));
     return jsonDecode(response.body)['sessions'] as List;
@@ -89,12 +98,26 @@ class _HomeState extends State<Home> {
   void _fetchData() async {
     try {
       final pref = await SharedPreferences.getInstance();
-      distCode = pref.getString('districtCode');
-      _enableNotification = pref.getBool("notification") ?? 0;
-      if(distCode=="" || distCode==null){
-      fetchTimer.cancel();
-      Fluttertoast.showToast(msg: "Please enter all data",gravity: ToastGravity.CENTER,toastLength: Toast.LENGTH_LONG);
-        Navigator.of(context).pushReplacement( MyCustomFormRoute());
+      distCode = pref.getString('districtCode') ?? "";
+      pincode = pref.getString('pincode') ?? "";
+      _enableNotification = pref.getBool("notification") ?? false;
+      _fetchByPincode = pref.getBool("fetchPincode") ?? false;
+
+      if (!_fetchByPincode && (distCode == "" || distCode == null)) {
+        fetchTimer.cancel();
+        Fluttertoast.showToast(
+            msg: "Please enter all data",
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_LONG);
+        Navigator.of(context).pushReplacement(MyCustomFormRoute());
+        return;
+      } else if (_fetchByPincode && (pincode == "" || pincode == null)) {
+        fetchTimer.cancel();
+        Fluttertoast.showToast(
+            msg: "Please enter all data",
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_LONG);
+        Navigator.of(context).pushReplacement(MyCustomFormRoute());
         return;
       }
       ageIndex = pref.getInt('age');
@@ -111,6 +134,12 @@ class _HomeState extends State<Home> {
           temp.where((val) => val['min_age_limit'] == age[ageIndex]).toList();
       data.addAll(temp);
       int total = 0;
+      if (data.length == 0) {
+        Fluttertoast.showToast(
+            msg: "No Centers found for given filters",
+            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT);
+      }
       for (var item in data) {
         total += item['available_capacity' + dose[doseIndex]];
       }
@@ -134,7 +163,7 @@ class _HomeState extends State<Home> {
   _HomeState() {
     _getData();
     _fetchData();
-    
+
     const period = const Duration(seconds: 15);
     fetchTimer = new Timer.periodic(period, (Timer t) => _fetchData());
     //_fetchData();
@@ -153,28 +182,21 @@ class _HomeState extends State<Home> {
               Padding(
                 padding: EdgeInsets.all(15),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     _fetchData();
                   },
-                  child: Icon(
-                    Icons.refresh,
-                    size: 26
-                  ),
+                  child: Icon(Icons.refresh, size: 26),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(15),
                 child: GestureDetector(
-                  onTap: (){
+                  onTap: () {
                     Navigator.push(context, MyCustomFormRoute());
                   },
-                  child: Icon(
-                    Icons.settings,
-                    size: 26
-                  ),
+                  child: Icon(Icons.settings, size: 26),
                 ),
               )
-            
             ],
           ),
           body: ListView.builder(

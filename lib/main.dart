@@ -36,9 +36,9 @@ class AppIntroScreen extends StatefulWidget {
 }
 
 class _AppIntroScreenState extends State<AppIntroScreen> {
- 
   @override
   Widget build(BuildContext context) {
     return Home();
   }
 }
+     

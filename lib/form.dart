@@ -39,12 +39,13 @@ class _MyCustomFormState extends State<MyCustomForm> {
   UserDose _dose = UserDose.Dose1;
   String _name = "";
   String _mobileNumber = "";
-  //String _pincode = "";
+  String _pincode = "";
   String _districtCode = "";
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _mobileNumberController = new TextEditingController();
-  //TextEditingController _pincodeController = new TextEditingController();
+  TextEditingController _pincodeController = new TextEditingController();
   bool _enableNotification = true;
+  bool _fetchByPincode = false;
 
   void _getValues() async {
     final pref = await SharedPreferences.getInstance();
@@ -56,8 +57,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       _mobileNumber = pref.getString('mobile') ?? "";
       _mobileNumberController.text = _mobileNumber;
 
-      //_pincode = pref.getString('pincode') ?? "";
-      //_pincodeController.text = _pincode;
+      _pincode = pref.getString('pincode') ?? "";
+      _pincodeController.text = _pincode;
 
       _age = UserAge.values[pref.getInt('age') ?? 0];
 
@@ -66,6 +67,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
       _dose = UserDose.values[pref.getInt('dose') ?? 0];
 
       _enableNotification = pref.getBool("notification") ?? true;
+      _fetchByPincode = pref.getBool("fetchPincode") ?? false;
     });
   }
 
@@ -82,10 +84,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
     pref.setString('mobile', value);
   }
 
-  /*void _setPincode(String value) async {
+  void _setPincode(String value) async {
     final pref = await SharedPreferences.getInstance();
     pref.setString('pincode', value);
-  }*/
+  }
 
   void _setDistrictCode(String value) async {
     final pref = await SharedPreferences.getInstance();
@@ -107,10 +109,16 @@ class _MyCustomFormState extends State<MyCustomForm> {
     pref.setInt("dose", value.index);
   }
 
-  void _setNotification(bool value) async{
+  void _setNotification(bool value) async {
     final pref = await SharedPreferences.getInstance();
     pref.setBool("notification", value);
   }
+
+  void _setFetchPincode(bool value) async {
+    final pref = await SharedPreferences.getInstance();
+    pref.setBool("fetchPincode", value);
+  }
+
   void fetchStates() async {
     print("Executed");
     try {
@@ -211,7 +219,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             }
                           },
                         ),
-                        /*TextFormField(
+                        TextFormField(
                           controller: _pincodeController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
@@ -227,7 +235,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               return "Enter a valid pincode";
                             }
                           },
-                        ),*/
+                        ),
                         DropdownButton<String>(
                           value: selectedState,
                           onChanged: (String newValue) {
@@ -406,11 +414,20 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             value: _enableNotification,
                             title: Text("Notification"),
                             subtitle: Text("Enable or disable notifiaction"),
-                            onChanged: (bool value){
+                            onChanged: (bool value) {
                               setState(() {
                                 _enableNotification = value;
                               });
-                            } ),
+                            }),
+                        SwitchListTile(
+                            value: _fetchByPincode,
+                            title: Text("Fetch slots by pincode"),
+                            subtitle: Text("Instead of district code"),
+                            onChanged: (bool value) {
+                              setState(() {
+                                _fetchByPincode = value;
+                              });
+                            }),
                         RaisedButton(
                             child: Text("Save Details"),
                             color: Colors.blue,
@@ -425,7 +442,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               formKey.currentState.save();
                               _setName(_name);
                               _setMobileNumber(_mobileNumber);
-                              //_setPincode(_pincode);
+                              _setPincode(_pincode);
+                              _setFetchPincode(_fetchByPincode);
                               _setDistrictCode(_districtCode);
                               _setAge(_age);
                               //_setVaccine(_vaccineType);
