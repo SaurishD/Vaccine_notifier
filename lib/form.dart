@@ -39,11 +39,11 @@ class _MyCustomFormState extends State<MyCustomForm> {
   UserDose _dose = UserDose.Dose1;
   String _name = "";
   String _mobileNumber = "";
-  String _pincode = "";
+  //String _pincode = "";
   String _districtCode = "";
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _mobileNumberController = new TextEditingController();
-  TextEditingController _pincodeController = new TextEditingController();
+  //TextEditingController _pincodeController = new TextEditingController();
 
   void _getValues() async {
     final pref = await SharedPreferences.getInstance();
@@ -55,8 +55,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       _mobileNumber = pref.getString('mobile') ?? "";
       _mobileNumberController.text = _mobileNumber;
 
-      _pincode = pref.getString('pincode') ?? "";
-      _pincodeController.text = _pincode;
+      //_pincode = pref.getString('pincode') ?? "";
+      //_pincodeController.text = _pincode;
 
       _age = UserAge.values[pref.getInt('age') ?? 0];
 
@@ -79,10 +79,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
     pref.setString('mobile', value);
   }
 
-  void _setPincode(String value) async {
+  /*void _setPincode(String value) async {
     final pref = await SharedPreferences.getInstance();
     pref.setString('pincode', value);
-  }
+  }*/
 
   void _setDistrictCode(String value) async {
     final pref = await SharedPreferences.getInstance();
@@ -204,7 +204,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             }
                           },
                         ),
-                        TextFormField(
+                        /*TextFormField(
                           controller: _pincodeController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
@@ -220,7 +220,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               return "Enter a valid pincode";
                             }
                           },
-                        ),
+                        ),*/
                         DropdownButton<String>(
                           value: selectedState,
                           onChanged: (String newValue) {
@@ -408,7 +408,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               formKey.currentState.save();
                               _setName(_name);
                               _setMobileNumber(_mobileNumber);
-                              _setPincode(_pincode);
+                              //_setPincode(_pincode);
                               _setDistrictCode(_districtCode);
                               _setAge(_age);
                               //_setVaccine(_vaccineType);
