@@ -41,6 +41,7 @@ class _HomeState extends State<Home> {
   Color primaryFontColor = Colors.grey[700];
   FlutterLocalNotificationsPlugin _localNotifications;
   Timer fetchTimer;
+  bool _enableNotification;
 
   @override
   void initState() {
@@ -66,7 +67,7 @@ class _HomeState extends State<Home> {
 
   void _getData() async {
     final pref = await SharedPreferences.getInstance();
-    pincode = pref.getString('pincode');
+    //pincode = pref.getString('pincode');
     doseIndex = pref.getInt('dose');
   }
 
@@ -89,6 +90,7 @@ class _HomeState extends State<Home> {
     try {
       final pref = await SharedPreferences.getInstance();
       distCode = pref.getString('districtCode');
+      _enableNotification = pref.getBool("notification") ?? 0;
       if(distCode=="" || distCode==null){
       fetchTimer.cancel();
       Fluttertoast.showToast(msg: "Please enter all data",gravity: ToastGravity.CENTER,toastLength: Toast.LENGTH_LONG);
@@ -112,7 +114,7 @@ class _HomeState extends State<Home> {
       for (var item in data) {
         total += item['available_capacity' + dose[doseIndex]];
       }
-      if (total > 0) {
+      if (total > 0 && _enableNotification) {
         _showNotification(total);
       }
       //print(data[0]['name']);

@@ -44,6 +44,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   TextEditingController _nameController = new TextEditingController();
   TextEditingController _mobileNumberController = new TextEditingController();
   //TextEditingController _pincodeController = new TextEditingController();
+  bool _enableNotification = true;
 
   void _getValues() async {
     final pref = await SharedPreferences.getInstance();
@@ -63,6 +64,8 @@ class _MyCustomFormState extends State<MyCustomForm> {
       //_vaccineType = VaccineType.values[pref.getInt('vaccine') ?? 0];
 
       _dose = UserDose.values[pref.getInt('dose') ?? 0];
+
+      _enableNotification = pref.getBool("notification") ?? true;
     });
   }
 
@@ -104,6 +107,10 @@ class _MyCustomFormState extends State<MyCustomForm> {
     pref.setInt("dose", value.index);
   }
 
+  void _setNotification(bool value) async{
+    final pref = await SharedPreferences.getInstance();
+    pref.setBool("notification", value);
+  }
   void fetchStates() async {
     print("Executed");
     try {
@@ -395,11 +402,21 @@ class _MyCustomFormState extends State<MyCustomForm> {
                             ),
                           )
                         ]),
+                        SwitchListTile(
+                            value: _enableNotification,
+                            title: Text("Notification"),
+                            subtitle: Text("Enable or disable notifiaction"),
+                            onChanged: (bool value){
+                              setState(() {
+                                _enableNotification = value;
+                              });
+                            } ),
                         RaisedButton(
                             child: Text("Save Details"),
                             color: Colors.blue,
                             textColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius:BorderRadius.circular(30)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
                             padding: EdgeInsets.fromLTRB(35, 15, 30, 15),
                             onPressed: () {
                               if (!formKey.currentState.validate()) {
@@ -413,6 +430,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               _setAge(_age);
                               //_setVaccine(_vaccineType);
                               _setDose(_dose);
+                              _setNotification(_enableNotification);
                               Navigator.push(context, HomePage());
                             })
                       ],
