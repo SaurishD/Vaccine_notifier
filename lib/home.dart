@@ -156,7 +156,8 @@ class _HomeState extends State<Home> {
         total += item['available_capacity' + dose[doseIndex]];
       }
       if (total > 0 && _enableNotification) {
-        //_enableNotification = false;
+        _enableNotification = false;
+        Timer(Duration(seconds:300),(){_enableNotification = true;});
         _showNotification(total);
       }
       //print(data[0]['name']);
