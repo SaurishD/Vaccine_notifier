@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import './home.dart';
 
-enum UserAge { EighteenPlus, FourtyfivePlus }
-enum UserDose { Dose1, Dose2 }
+enum UserAge { EighteenPlus,ThirtyPlus, FourtyfivePlus }
+enum UserDose { All,Dose1, Dose2 }
 enum VaccineType { All, CoviShield, Covaxine, SputnicV }
 
 class MyCustomFormRoute extends MaterialPageRoute<Null> {
@@ -278,12 +279,28 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           },
                         ),
                         
-                        Row(children: <Widget>[
+                        
                           Flexible(
                             child: ListTile(
-                              title: Text("18-44"),
+                              title: Text("18+"),
                               leading: Radio<UserAge>(
                                 value: UserAge.EighteenPlus,
+                                groupValue: _age,
+                                onChanged: (UserAge value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _age = value;
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: ListTile(
+                              title: Text("30+"),
+                              leading: Radio<UserAge>(
+                                value: UserAge.ThirtyPlus,
                                 groupValue: _age,
                                 onChanged: (UserAge value) {
                                   if (value != null) {
@@ -310,8 +327,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                                 },
                               ),
                             ),
-                          )
-                        ]),
+                          ),
                         Divider(),
                         Flexible(
                           child: ListTile(
@@ -378,7 +394,24 @@ class _MyCustomFormState extends State<MyCustomForm> {
                           ),
                         ),
                         Divider(),
-                        Row(children: <Widget>[
+                        
+                          Flexible(
+                            child: ListTile(
+                              title: Text("All"),
+                              leading: Radio<UserDose>(
+                                value: UserDose.All,
+                                groupValue: _dose,
+                                onChanged: (UserDose value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      _dose = value;
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+                          
                           Flexible(
                             child: ListTile(
                               title: Text("Dose1"),
@@ -410,8 +443,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
                                 },
                               ),
                             ),
-                          )
-                        ]),
+                          ),
                         Divider(),
                         SwitchListTile(
                             value: _enableNotification,
@@ -453,6 +485,21 @@ class _MyCustomFormState extends State<MyCustomForm> {
                               _setVaccine(_vaccineType);
                               _setDose(_dose);
                               _setNotification(_enableNotification);
+                              if (!_fetchByPincode && (_districtCode == "" || _districtCode == null)) {
+                                Fluttertoast.showToast(
+                                    msg: "Please enter all data",
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                //Navigator.of(context).pushReplacement(MyCustomFormRoute());
+                                return;
+                              } else if (_fetchByPincode && (_pincode == "" || _pincode == null)) {
+                                Fluttertoast.showToast(
+                                    msg: "Please enter all data",
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                //Navigator.of(context).pushReplacement(MyCustomFormRoute());
+                                return;
+                              }
                               Navigator.push(context, HomePage());
                             })
                       ],

@@ -33,9 +33,9 @@ class _HomeState extends State<Home> {
   String pincode = "";
   String distCode = "";
   List<dynamic> data = [];
-  List<String> dose = ["_dose1", "_dose2"];
+  List<String> dose = ["","_dose1", "_dose2"];
   List<String> vaccine = ["All","COVISHIELD","COVAXIN","SPUTNIKV"];
-  List<int> age = [18, 45];
+  List<int> age = [18,30, 45];
   int ageIndex = 0;
   int doseIndex = 0;
   int vaccineIndex = 0;
@@ -58,17 +58,18 @@ class _HomeState extends State<Home> {
   Future _showNotification(int num) async {
     print("Notified");
     var androidDetails = AndroidNotificationDetails(
-        "channelId", "channelName", "Vaccine are available in your area");
+        "channelId", "channelName", "Vaccines are available in your area");
     var notificationDetails = NotificationDetails(android: androidDetails);
     await _localNotifications.show(
         0,
-        "Vaccine are available",
+        "Vaccines are available",
         num.toString() + " Slots are available in your city",
         notificationDetails,);
   }
 
   void _getData() async {
     final pref = await SharedPreferences.getInstance();
+    _enableNotification = pref.getBool("notification") ?? false;
     //pincode = pref.getString('pincode');
     doseIndex = pref.getInt('dose');
   }
@@ -102,7 +103,7 @@ class _HomeState extends State<Home> {
       final pref = await SharedPreferences.getInstance();
       distCode = pref.getString('districtCode') ?? "";
       pincode = pref.getString('pincode') ?? "";
-      _enableNotification = pref.getBool("notification") ?? false;
+      
       _fetchByPincode = pref.getBool("fetchPincode") ?? false;
       vaccineIndex = pref.getInt("vaccine") ?? 0;
 
@@ -155,6 +156,7 @@ class _HomeState extends State<Home> {
         total += item['available_capacity' + dose[doseIndex]];
       }
       if (total > 0 && _enableNotification) {
+        //_enableNotification = false;
         _showNotification(total);
       }
       //print(data[0]['name']);
